@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: urotaxidb-mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: urotaxi-mysql
+      version: "8.0.32"
+  template:
+    metadata:
+      labels:
+        app: urotaxi-mysql
+        version: "8.0.32"
+    spec:
+      containers:
+        - name: urotaxi-mysql-container
+          image: msyql:8.0.32
+          ports:
+            - name: mysqlport
+              containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+               secretKeyRef:
+                 key: password
+                 name: urotaxi-mysql-secret
+          volumeMounts:
+            - name: urotaxi-mysql-volume
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: urotaxi-mysql-volume
+          persistentVolumeClaim:
+            claimName: urotaxi-mysql-pvc

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: urotaxi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: urotaxi
+  template:
+    metadata:
+      labels:
+        app: urotaxi
+    spec:
+      containers:
+        - name: urotaxi-container
+          image: yelender/urotaxi:1.0
+          ports:
+            - containerPort: 8080
+              name: tomcatport
+              protocol: TCP
+          env:
+            - name: spring_datasource_url
+              valueFrom:
+                configMapKeyRef:
+                  key: url
+                  name: urotaxi-configmap
+            - name: spring_datasource_username
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: urotaxi-mysql-secret
+            - name: spring_datasource_password
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: urotaxi-mysql-secret
+          readinessProbe:
+            httpGet:
+              path: /urotaxi/actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 15
+            timeoutSeconds: 25     
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /urotaxi/actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 15
+            timeoutSeconds: 25     
+            failureThreshold: 3
+              
+                
+

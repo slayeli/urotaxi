@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: urotaxi-configmap
+data:
+ url: jdbc:mysql://urotaxi-mysql-clusterip-service:3306/urotaxidb
